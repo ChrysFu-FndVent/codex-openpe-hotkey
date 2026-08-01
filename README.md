@@ -22,7 +22,7 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
   <a href="https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/stargazers"><img src="https://img.shields.io/github/stars/ChrysFu-FndVent/codex-openpe-hotkey?style=for-the-badge&color=9A6700&labelColor=24292F" alt="GitHub stars" /></a>
 </p>
 
-[中文快速开始](#zh-getting-started) · [English Quick Start](#en-getting-started) · [架构 / Architecture](#zh-architecture) · [组件 / Components](#zh-components)
+[快速使用](#zh-usage) · [自定义快捷键](#zh-hotkey) · [安装](#zh-getting-started) · [English](#english)
 
 </div>
 
@@ -55,11 +55,11 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 <summary><strong>目录</strong></summary>
 
 - [核心能力](#zh-features)
+- [在 Codex 中快速使用](#zh-usage)
+- [自定义快捷键](#zh-hotkey)
 - [工作方式](#zh-architecture)
 - [组件与插件](#zh-components)
 - [快速开始](#zh-getting-started)
-- [在 Codex 中使用](#zh-usage)
-- [自定义快捷键](#zh-hotkey)
 - [配置参考](#zh-configuration)
 - [安全边界](#zh-security)
 - [故障排查](#zh-troubleshooting)
@@ -88,6 +88,40 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 [OpenPE ⠴] 仍在生成 20s
 [OpenPE ⠧] 网络较慢 50s
 ```
+
+<p align="right">(<a href="#readme-top">返回顶部</a>)</p>
+
+<a id="zh-usage"></a>
+
+### 💡 在 Codex 中快速使用
+
+1. 打开 Codex 桌面输入框。
+2. 选中需要优化的完整提示词。
+3. 按状态脚本显示的快捷键。默认值为 macOS `Option+Q`、Windows `Alt+Q`。
+4. 保持 Codex 窗口和选区不变。
+5. 等待输入框内的动态进度被优化结果替换。
+
+如果处理期间切换窗口或改变选区，后台程序会避免向错误位置写入，并在可能时恢复原文。成功结果会保留在剪贴板中。
+
+<a id="zh-hotkey"></a>
+
+### ⌨️ 自定义快捷键
+
+快捷键不区分大小写，必须包含至少一个修饰键和一个普通按键。不允许无修饰键的 `Q`、重复修饰键或未支持的按键。
+
+macOS：
+
+```bash
+./scripts/install.sh --hotkey 'command+shift+p'
+```
+
+Windows：
+
+```powershell
+.\scripts\windows\configure.ps1 -HotKey "Ctrl+Shift+P"
+```
+
+支持的普通按键为 `A`–`Z`、`0`–`9`、`F1`–`F12`。若组合已被系统或其他应用占用，请更换组合并重新运行状态检查。再次运行安装脚本时，已有自定义快捷键会被保留。
 
 <p align="right">(<a href="#readme-top">返回顶部</a>)</p>
 
@@ -245,40 +279,6 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 <p align="right">(<a href="#readme-top">返回顶部</a>)</p>
 
-<a id="zh-usage"></a>
-
-### 💡 在 Codex 中使用
-
-1. 打开 Codex 桌面输入框。
-2. 选中需要优化的完整提示词。
-3. 按状态脚本显示的快捷键。默认值为 macOS `Option+Q`、Windows `Alt+Q`。
-4. 保持 Codex 窗口和选区不变。
-5. 等待输入框内的动态进度被优化结果替换。
-
-如果处理期间切换窗口或改变选区，后台程序会避免向错误位置写入，并在可能时恢复原文。成功结果会保留在剪贴板中。
-
-<a id="zh-hotkey"></a>
-
-### ⌨️ 自定义快捷键
-
-快捷键不区分大小写，必须包含至少一个修饰键和一个普通按键。不允许无修饰键的 `Q`、重复修饰键或未支持的按键。
-
-macOS：
-
-```bash
-./scripts/install.sh --hotkey 'command+shift+p'
-```
-
-Windows：
-
-```powershell
-.\scripts\windows\configure.ps1 -HotKey "Ctrl+Shift+P"
-```
-
-支持的普通按键为 `A`–`Z`、`0`–`9`、`F1`–`F12`。若组合已被系统或其他应用占用，请更换组合并重新运行状态检查。再次运行安装脚本时，已有自定义快捷键会被保留。
-
-<p align="right">(<a href="#readme-top">返回顶部</a>)</p>
-
 <a id="zh-configuration"></a>
 
 ### ⚙️ 配置参考
@@ -430,11 +430,11 @@ Default shortcuts:
 <summary><strong>Table of Contents</strong></summary>
 
 - [Features](#en-features)
+- [Quick Use in Codex](#en-usage)
+- [Custom Hotkeys](#en-hotkey)
 - [Architecture](#en-architecture)
 - [Components and Plugins](#en-components)
 - [Getting Started](#en-getting-started)
-- [Using It in Codex](#en-usage)
-- [Custom Hotkeys](#en-hotkey)
 - [Configuration](#en-configuration)
 - [Security Boundaries](#en-security)
 - [Troubleshooting](#en-troubleshooting)
@@ -463,6 +463,40 @@ Inline progress example:
 [OpenPE ⠴] Still generating 20s
 [OpenPE ⠧] Network is slow 50s
 ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<a id="en-usage"></a>
+
+### 💡 Quick Use in Codex
+
+1. Open the Codex desktop composer.
+2. Select the complete prompt you want to improve.
+3. Press the shortcut shown by the status script. The defaults are `Option+Q` on macOS and `Alt+Q` on Windows.
+4. Keep the Codex window and selection unchanged.
+5. Wait for the inline progress text to be replaced by the enhanced prompt.
+
+If the window or selection changes during processing, the helper avoids writing into the wrong location and restores the original text when possible. A successful result remains available on the clipboard.
+
+<a id="en-hotkey"></a>
+
+### ⌨️ Custom Hotkeys
+
+Hotkeys are case-insensitive and must contain at least one modifier plus one ordinary key. A modifier-free `Q`, duplicate modifiers, and unsupported keys are rejected.
+
+macOS:
+
+```bash
+./scripts/install.sh --hotkey 'command+shift+p'
+```
+
+Windows:
+
+```powershell
+.\scripts\windows\configure.ps1 -HotKey "Ctrl+Shift+P"
+```
+
+Supported ordinary keys are `A`–`Z`, `0`–`9`, and `F1`–`F12`. If another application or the operating system already owns the combination, choose another one and rerun the status check. Existing custom hotkeys are preserved when the installer is run again.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -617,40 +651,6 @@ Enable `OpenPE Hotkey` in System Settings → Privacy & Security → Accessibili
 ```bash
 ./scripts/status.sh
 ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<a id="en-usage"></a>
-
-### 💡 Using It in Codex
-
-1. Open the Codex desktop composer.
-2. Select the complete prompt you want to improve.
-3. Press the shortcut shown by the status script. The defaults are `Option+Q` on macOS and `Alt+Q` on Windows.
-4. Keep the Codex window and selection unchanged.
-5. Wait for the inline progress text to be replaced by the enhanced prompt.
-
-If the window or selection changes during processing, the helper avoids writing into the wrong location and restores the original text when possible. A successful result remains available on the clipboard.
-
-<a id="en-hotkey"></a>
-
-### ⌨️ Custom Hotkeys
-
-Hotkeys are case-insensitive and must contain at least one modifier plus one ordinary key. A modifier-free `Q`, duplicate modifiers, and unsupported keys are rejected.
-
-macOS:
-
-```bash
-./scripts/install.sh --hotkey 'command+shift+p'
-```
-
-Windows:
-
-```powershell
-.\scripts\windows\configure.ps1 -HotKey "Ctrl+Shift+P"
-```
-
-Supported ordinary keys are `A`–`Z`, `0`–`9`, and `F1`–`F12`. If another application or the operating system already owns the combination, choose another one and rerun the status check. Existing custom hotkeys are preserved when the installer is run again.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
