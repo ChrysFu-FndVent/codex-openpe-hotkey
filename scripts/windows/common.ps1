@@ -62,7 +62,18 @@ function Get-OpenPEStartupShortcut {
 }
 
 function Get-HelperReferences {
-    return @(
+    $referenceDirectories = @(
+        [Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory()
+    )
+    foreach ($programFilesDirectory in @(${env:ProgramFiles(x86)}, $env:ProgramFiles)) {
+        if (-not [string]::IsNullOrWhiteSpace($programFilesDirectory)) {
+            $referenceDirectories += Join-Path `
+                $programFilesDirectory `
+                "Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8"
+        }
+    }
+
+    $referenceNames = @(
         "System.dll",
         "System.Core.dll",
         "System.Net.Http.dll",
@@ -71,6 +82,20 @@ function Get-HelperReferences {
         "UIAutomationClient.dll",
         "UIAutomationTypes.dll"
     )
+    foreach ($referenceName in $referenceNames) {
+        $resolvedReference = $null
+        foreach ($referenceDirectory in $referenceDirectories) {
+            $candidate = Join-Path $referenceDirectory $referenceName
+            if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+                $resolvedReference = (Resolve-Path -LiteralPath $candidate).Path
+                break
+            }
+        }
+        if ($null -eq $resolvedReference) {
+            throw "Required .NET Framework reference was not found: $referenceName"
+        }
+        $resolvedReference
+    }
 }
 
 function Build-WindowsHelper {
