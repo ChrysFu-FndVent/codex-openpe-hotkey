@@ -1,15 +1,30 @@
 <a id="readme-top"></a>
 
+<div align="right"><a href="#简体中文">简体中文</a> | <a href="#english">English</a></div>
+
+<div align="center">
+
 # Codex OpenPE Hotkey
 
 Inline prompt enhancement for Codex, triggered by a configurable desktop shortcut.
 
-![Version](https://img.shields.io/badge/version-0.3.0-0969DA?style=flat)
-![macOS](https://img.shields.io/badge/macOS-13%2B-24292F?style=flat&logo=apple&logoColor=white)
-![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat&logo=windows&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-1A7F37?style=flat)
+<p>
+  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=21&duration=2800&pause=900&color=0969DA&center=true&vCenter=true&repeat=true&width=820&lines=Option%2BQ+on+macOS+%C2%B7+Alt%2BQ+on+Windows;Select+%E2%86%92+Enhance+%E2%86%92+Replace;Inline+progress+%C2%B7+No+floating+window" alt="Animated summary: configurable hotkey, inline prompt enhancement, and visible progress" />
+</p>
 
-<div align="right"><a href="#简体中文">简体中文</a> | <a href="#english">English</a></div>
+<p>
+  <a href="https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/ChrysFu-FndVent/codex-openpe-hotkey/ci.yml?branch=main&style=for-the-badge&label=CI&labelColor=24292F" alt="CI status" /></a>
+  <img src="https://img.shields.io/badge/version-0.3.0-0969DA?style=for-the-badge&labelColor=24292F" alt="Version 0.3.0" />
+  <img src="https://img.shields.io/badge/macOS-13%2B-24292F?style=for-the-badge&logo=apple&logoColor=white" alt="macOS 13 or later" />
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292F" alt="Windows 10 or 11" />
+  <img src="https://img.shields.io/badge/Codex-Plugin%20%2B%20Skill-0969DA?style=for-the-badge&logo=openai&logoColor=white&labelColor=24292F" alt="Codex plugin and Skill" />
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/ChrysFu-FndVent/codex-openpe-hotkey?style=for-the-badge&color=1A7F37&labelColor=24292F" alt="MIT License" /></a>
+  <a href="https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/stargazers"><img src="https://img.shields.io/github/stars/ChrysFu-FndVent/codex-openpe-hotkey?style=for-the-badge&color=9A6700&labelColor=24292F" alt="GitHub stars" /></a>
+</p>
+
+[中文快速开始](#zh-getting-started) · [English Quick Start](#en-getting-started) · [架构 / Architecture](#zh-architecture) · [组件 / Components](#zh-components)
+
+</div>
 
 ---
 
@@ -20,6 +35,14 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 **中文项目名：Codex OpenPE 指令优化快捷键**
 
 在 Codex 桌面输入框中选中提示词，按下全局快捷键，通过本地 [openPE](https://github.com/AoManoh/openpe) 服务优化指令。生成期间，输入框会直接显示动态进度；完成后，进度文字会被优化结果原地替换。
+
+| 一眼概览 | 说明 |
+| --- | --- |
+| **触发方式** | macOS `Option+Q` · Windows `Alt+Q` · 支持自定义 |
+| **交互位置** | 直接在 Codex 已选中的输入框文字中显示进度并替换结果 |
+| **运行形态** | 无悬浮窗、无 Dock/任务栏图标、无菜单栏/系统托盘图标 |
+| **本地链路** | 平台后台程序 → `127.0.0.1:18980` → openPE → OpenAI-compatible 网关 |
+| **凭据存储** | macOS Keychain · Windows Credential Manager |
 
 默认快捷键：
 
@@ -33,6 +56,7 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 
 - [核心能力](#zh-features)
 - [工作方式](#zh-architecture)
+- [组件与插件](#zh-components)
 - [快速开始](#zh-getting-started)
 - [在 Codex 中使用](#zh-usage)
 - [自定义快捷键](#zh-hotkey)
@@ -48,15 +72,14 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 
 <a id="zh-features"></a>
 
-### 核心能力
+### ⚡ 核心能力
 
-- **输入框内优化**：不显示悬浮窗、Dock/任务栏图标或菜单栏/系统托盘图标。
-- **可见生成进度**：依次显示“正在优化”“仍在生成”“网络较慢”和已用秒数。
-- **双平台快捷键**：macOS 使用 Carbon，Windows 使用 Win32 `RegisterHotKey`。
-- **选区所有权保护**：焦点、窗口或选区发生变化时，不向错误位置注入结果。
-- **失败恢复**：请求失败或超时会尽力恢复原文；无法安全原地替换时将结果复制到剪贴板。
-- **本地安全边界**：辅助程序只连接 loopback 地址，并通过 bearer token 访问本地服务。
-- **Codex 插件工作流**：内置 Skill 可协助安装、诊断、验证和卸载。
+| 输入体验 | 可靠性与安全 |
+| --- | --- |
+| **输入框内优化**：直接处理选区，不显示额外界面 | **选区所有权保护**：焦点、窗口或选区变化后停止错误注入 |
+| **可见生成进度**：展示阶段、动画和已用秒数 | **失败恢复**：失败或超时尽力恢复原文，必要时回退到剪贴板 |
+| **双平台快捷键**：Carbon 与 Win32 `RegisterHotKey` | **本地安全边界**：只连接 loopback，并使用 bearer token |
+| **快捷键可自定义**：支持修饰键与字母、数字、功能键组合 | **Codex 插件工作流**：Skill 协助安装、诊断、验证和卸载 |
 
 输入框中的进度示例：
 
@@ -70,9 +93,13 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 
 <a id="zh-architecture"></a>
 
-### 工作方式
+### 🏗️ 工作方式
 
-![Codex OpenPE 架构图](assets/readme/architecture.png)
+<p align="center">
+  <img src="assets/readme/architecture.png" alt="Codex OpenPE 架构图" width="100%" />
+</p>
+
+<p align="center"><sub>可编辑源文件：<a href="assets/readme/architecture.drawio">architecture.drawio</a></sub></p>
 
 1. 用户在 Codex 输入框中选中文字并按下已配置的快捷键。
 2. 平台后台程序确认前台应用、焦点与选区所有权，然后在原选区显示动态进度。
@@ -85,9 +112,36 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 
 <p align="right">(<a href="#readme-top">返回顶部</a>)</p>
 
+<a id="zh-components"></a>
+
+### 🧩 组件与插件
+
+这不是单一 MCP 服务，而是一套各司其职的插件与桌面组件。Codex 插件负责工作流发现，平台后台程序负责系统快捷键和输入框选区，openPE 负责实际提示词优化。
+
+| 组件 | 项目位置 | 职责 |
+| --- | --- | --- |
+| **Codex Marketplace** | [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json) | 让其他用户从 GitHub 添加本仓库并发现插件 |
+| **Codex Plugin** | [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json) | 声明插件元数据、版本、能力和 Skill 目录 |
+| **Codex Skill** | [`skills/codex-openpe-hotkey/SKILL.md`](skills/codex-openpe-hotkey/SKILL.md) | 指导 Codex 安装、配置、诊断、验证和卸载 |
+| **macOS Helper** | [`Sources/CodexOpenPEHotkey/`](Sources/CodexOpenPEHotkey/) | Carbon 全局快捷键、Accessibility 选区操作和输入框内进度 |
+| **Windows Helper** | [`windows/OpenPEHotkey.Windows.cs`](windows/OpenPEHotkey.Windows.cs) | Win32 快捷键、UI Automation、后台启动和进度替换 |
+| **openPE Server** | [AoManoh/openpe](https://github.com/AoManoh/openpe) | 在本地提供提示词增强 API 并连接已配置模型网关 |
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Swift-5.9%2B-F05138?style=for-the-badge&logo=swift&logoColor=white" alt="Swift 5.9 or later" />
+  <img src="https://img.shields.io/badge/.NET%20Framework-4.8-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET Framework 4.8" />
+  <img src="https://img.shields.io/badge/PowerShell-5.1-5391FE?style=for-the-badge&logo=powershell&logoColor=white" alt="Windows PowerShell 5.1" />
+  <img src="https://img.shields.io/badge/GitHub%20Actions-macOS%20%2B%20Windows-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions on macOS and Windows" />
+</p>
+
+> [!TIP]
+> 只安装 Codex Plugin 会获得安装与诊断工作流；真正的系统全局快捷键仍由对应平台 Helper 注册。
+
+<p align="right">(<a href="#readme-top">返回顶部</a>)</p>
+
 <a id="zh-getting-started"></a>
 
-### 快速开始
+### 🚀 快速开始
 
 #### 1. 公共依赖
 
@@ -193,7 +247,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 <a id="zh-usage"></a>
 
-### 在 Codex 中使用
+### 💡 在 Codex 中使用
 
 1. 打开 Codex 桌面输入框。
 2. 选中需要优化的完整提示词。
@@ -205,7 +259,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 <a id="zh-hotkey"></a>
 
-### 自定义快捷键
+### ⌨️ 自定义快捷键
 
 快捷键不区分大小写，必须包含至少一个修饰键和一个普通按键。不允许无修饰键的 `Q`、重复修饰键或未支持的按键。
 
@@ -227,7 +281,7 @@ Windows：
 
 <a id="zh-configuration"></a>
 
-### 配置参考
+### ⚙️ 配置参考
 
 | 配置 | 默认值 | 平台 | 用途 |
 | --- | --- | --- | --- |
@@ -257,7 +311,7 @@ macOS 配置默认写入 `~/.config/openpe/.env`。可以为 `configure.sh` 和 
 
 <a id="zh-security"></a>
 
-### 安全边界
+### 🔒 安全边界
 
 - 仅处理用户明确选中的文字，不读取未选中的输入框内容。
 - 默认只响应 Codex/ChatGPT 允许列表中的桌面进程。
@@ -268,7 +322,7 @@ macOS 配置默认写入 `~/.config/openpe/.env`。可以为 `configure.sh` 和 
 
 <a id="zh-troubleshooting"></a>
 
-### 故障排查
+### 🩺 故障排查
 
 | 现象 | 检查项 |
 | --- | --- |
@@ -292,7 +346,7 @@ macOS 配置默认写入 `~/.config/openpe/.env`。可以为 `configure.sh` 和 
 
 <a id="zh-development"></a>
 
-### 开发与验证
+### 🧪 开发与验证
 
 macOS：
 
@@ -312,7 +366,7 @@ GitHub Actions 会分别在 macOS 和 Windows runner 上构建对应实现。发
 
 <a id="zh-structure"></a>
 
-### 项目结构
+### 📂 项目结构
 
 <details>
 <summary>展开目录</summary>
@@ -335,13 +389,13 @@ GitHub Actions 会分别在 macOS 和 Windows runner 上构建对应实现。发
 
 <a id="zh-contributing"></a>
 
-### 贡献
+### 🤝 贡献
 
 欢迎提交问题和 Pull Request。修改运行时代码后，请执行对应平台构建、项目验证脚本、Codex 插件验证器和 Skill 验证器，并说明是否完成了真实 Codex 输入框端到端测试。
 
 <a id="zh-license"></a>
 
-### 许可证
+### 📄 许可证
 
 本项目使用 [MIT License](LICENSE)。
 
@@ -357,6 +411,14 @@ GitHub Actions 会分别在 macOS 和 Windows runner 上构建对应实现。发
 
 Select a prompt in the Codex desktop composer and press a global hotkey to enhance it through a local [openPE](https://github.com/AoManoh/openpe) service. The composer shows live progress in the selected range and replaces that progress with the enhanced prompt when generation finishes.
 
+| At a glance | Details |
+| --- | --- |
+| **Trigger** | macOS `Option+Q` · Windows `Alt+Q` · fully customizable |
+| **Interaction** | Shows progress inside the selected Codex composer text, then replaces it with the result |
+| **Runtime shape** | No floating window, Dock/taskbar icon, menu bar item, or system tray icon |
+| **Local path** | Platform helper → `127.0.0.1:18980` → openPE → OpenAI-compatible gateway |
+| **Credential storage** | macOS Keychain · Windows Credential Manager |
+
 Default shortcuts:
 
 | Platform | Default | Customizable |
@@ -369,6 +431,7 @@ Default shortcuts:
 
 - [Features](#en-features)
 - [Architecture](#en-architecture)
+- [Components and Plugins](#en-components)
 - [Getting Started](#en-getting-started)
 - [Using It in Codex](#en-usage)
 - [Custom Hotkeys](#en-hotkey)
@@ -384,15 +447,14 @@ Default shortcuts:
 
 <a id="en-features"></a>
 
-### Features
+### ⚡ Features
 
-- **Inline enhancement**: no floating window, Dock/taskbar icon, menu bar item, or system tray icon.
-- **Visible generation progress**: shows optimizing, continued generation, slow-network state, and elapsed seconds.
-- **Cross-platform hotkeys**: Carbon on macOS and Win32 `RegisterHotKey` on Windows.
-- **Selection ownership checks**: avoids injecting output after the focus, window, or selection changes.
-- **Failure recovery**: restores the original text when possible; copies successful output to the clipboard when inline replacement is no longer safe.
-- **Local security boundary**: connects only to a loopback endpoint and authenticates local requests with a bearer token.
-- **Codex plugin workflow**: includes a Skill for installation, diagnosis, validation, and removal.
+| Input Experience | Reliability and Security |
+| --- | --- |
+| **Inline enhancement**: works directly in the selected range with no extra interface | **Selection ownership**: stops unsafe injection after focus, window, or selection changes |
+| **Visible progress**: shows stage, animation, and elapsed seconds | **Failure recovery**: restores source text when possible and falls back to the clipboard |
+| **Cross-platform hotkeys**: Carbon and Win32 `RegisterHotKey` | **Local boundary**: accepts only loopback endpoints and uses bearer authentication |
+| **Custom shortcuts**: combines modifiers with letters, digits, or function keys | **Codex plugin workflow**: the Skill supports install, diagnosis, validation, and removal |
 
 Inline progress example:
 
@@ -406,9 +468,13 @@ Inline progress example:
 
 <a id="en-architecture"></a>
 
-### Architecture
+### 🏗️ Architecture
 
-![Codex OpenPE architecture](assets/readme/architecture.png)
+<p align="center">
+  <img src="assets/readme/architecture.png" alt="Codex OpenPE architecture" width="100%" />
+</p>
+
+<p align="center"><sub>Editable source: <a href="assets/readme/architecture.drawio">architecture.drawio</a></sub></p>
 
 1. The user selects text in the Codex composer and presses the configured hotkey.
 2. The platform helper verifies the foreground application, focus, and selection ownership, then renders progress in the selected range.
@@ -421,9 +487,36 @@ Inline progress example:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<a id="en-components"></a>
+
+### 🧩 Components and Plugins
+
+This is not a single MCP service. It is a set of focused plugins and desktop components: the Codex plugin provides workflow discovery, each platform helper owns the global hotkey and composer selection, and openPE performs the prompt enhancement.
+
+| Component | Project location | Responsibility |
+| --- | --- | --- |
+| **Codex Marketplace** | [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json) | Lets users add this GitHub repository and discover the plugin |
+| **Codex Plugin** | [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json) | Declares plugin metadata, version, capabilities, and Skill directory |
+| **Codex Skill** | [`skills/codex-openpe-hotkey/SKILL.md`](skills/codex-openpe-hotkey/SKILL.md) | Guides Codex through installation, configuration, diagnosis, validation, and removal |
+| **macOS Helper** | [`Sources/CodexOpenPEHotkey/`](Sources/CodexOpenPEHotkey/) | Carbon hotkey, Accessibility selection control, and inline progress |
+| **Windows Helper** | [`windows/OpenPEHotkey.Windows.cs`](windows/OpenPEHotkey.Windows.cs) | Win32 hotkey, UI Automation, background startup, and progress replacement |
+| **openPE Server** | [AoManoh/openpe](https://github.com/AoManoh/openpe) | Exposes the local enhancement API and connects to the configured model gateway |
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Swift-5.9%2B-F05138?style=for-the-badge&logo=swift&logoColor=white" alt="Swift 5.9 or later" />
+  <img src="https://img.shields.io/badge/.NET%20Framework-4.8-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET Framework 4.8" />
+  <img src="https://img.shields.io/badge/PowerShell-5.1-5391FE?style=for-the-badge&logo=powershell&logoColor=white" alt="Windows PowerShell 5.1" />
+  <img src="https://img.shields.io/badge/GitHub%20Actions-macOS%20%2B%20Windows-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions on macOS and Windows" />
+</p>
+
+> [!TIP]
+> Installing only the Codex Plugin provides the installation and diagnostic workflow. The platform helper still registers the actual operating-system global hotkey.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <a id="en-getting-started"></a>
 
-### Getting Started
+### 🚀 Getting Started
 
 #### 1. Shared prerequisites
 
@@ -529,7 +622,7 @@ Enable `OpenPE Hotkey` in System Settings → Privacy & Security → Accessibili
 
 <a id="en-usage"></a>
 
-### Using It in Codex
+### 💡 Using It in Codex
 
 1. Open the Codex desktop composer.
 2. Select the complete prompt you want to improve.
@@ -541,7 +634,7 @@ If the window or selection changes during processing, the helper avoids writing 
 
 <a id="en-hotkey"></a>
 
-### Custom Hotkeys
+### ⌨️ Custom Hotkeys
 
 Hotkeys are case-insensitive and must contain at least one modifier plus one ordinary key. A modifier-free `Q`, duplicate modifiers, and unsupported keys are rejected.
 
@@ -563,7 +656,7 @@ Supported ordinary keys are `A`–`Z`, `0`–`9`, and `F1`–`F12`. If another a
 
 <a id="en-configuration"></a>
 
-### Configuration
+### ⚙️ Configuration
 
 | Setting | Default | Platform | Purpose |
 | --- | --- | --- | --- |
@@ -593,7 +686,7 @@ The macOS configuration is written to `~/.config/openpe/.env` by default. Set th
 
 <a id="en-security"></a>
 
-### Security Boundaries
+### 🔒 Security Boundaries
 
 - Processes only text the user explicitly selected; it does not read unselected composer content.
 - Responds only to desktop applications in the platform allowlist by default.
@@ -604,7 +697,7 @@ The macOS configuration is written to `~/.config/openpe/.env` by default. Set th
 
 <a id="en-troubleshooting"></a>
 
-### Troubleshooting
+### 🩺 Troubleshooting
 
 | Symptom | Check |
 | --- | --- |
@@ -628,7 +721,7 @@ Log locations:
 
 <a id="en-development"></a>
 
-### Development and Validation
+### 🧪 Development and Validation
 
 macOS:
 
@@ -648,7 +741,7 @@ GitHub Actions builds and validates the platform implementations on separate mac
 
 <a id="en-structure"></a>
 
-### Project Structure
+### 📂 Project Structure
 
 <details>
 <summary>Expand the directory map</summary>
@@ -671,13 +764,13 @@ GitHub Actions builds and validates the platform implementations on separate mac
 
 <a id="en-contributing"></a>
 
-### Contributing
+### 🤝 Contributing
 
 Issues and pull requests are welcome. After changing runtime code, run the platform build, project validation script, Codex plugin validator, and Skill validator. State whether a real Codex composer end-to-end test was completed.
 
 <a id="en-license"></a>
 
-### License
+### 📄 License
 
 Released under the [MIT License](LICENSE).
 
