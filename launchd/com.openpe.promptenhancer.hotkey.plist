@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.openpe.promptenhancer.hotkey</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>__HOTKEY_EXECUTABLE__</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>OPENPE_ALLOWED_BUNDLE_IDS</key>
+        <string>com.openai.codex</string>
+        <key>OPENPE_ENDPOINT</key>
+        <string>http://127.0.0.1:18980/v1/prompt-enhance</string>
+        <key>OPENPE_HOTKEY_TIMEOUT_SECONDS</key>
+        <string>75</string>
+        <key>OPENPE_HOTKEY</key>
+        <string>option+q</string>
+        <key>OPENPE_PROGRESS_LANGUAGE</key>
+        <string>zh</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ProcessType</key>
+    <string>Interactive</string>
+    <key>StandardOutPath</key>
+    <string>__HOTKEY_STDOUT__</string>
+    <key>StandardErrorPath</key>
+    <string>__HOTKEY_STDERR__</string>
+</dict>
+</plist>

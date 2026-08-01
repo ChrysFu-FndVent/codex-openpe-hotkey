@@ -1,0 +1,20 @@
+{
+  "name": "codex-openpe-hotkey",
+  "interface": {
+    "displayName": "Codex OpenPE Hotkey"
+  },
+  "plugins": [
+    {
+      "name": "codex-openpe-hotkey",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

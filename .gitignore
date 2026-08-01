@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+.swiftpm/
+*.xcuserstate
+*.log
+.env
+runtime.env
+windows/bin/
+windows/obj/
+.readme-architect/

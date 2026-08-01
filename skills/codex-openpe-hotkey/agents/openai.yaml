@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex OpenPE Hotkey"
+  short_description: "Configure and diagnose prompt hotkeys on macOS or Windows"
+  default_prompt: "Use $codex-openpe-hotkey to install or configure prompt enhancement with my preferred desktop shortcut."

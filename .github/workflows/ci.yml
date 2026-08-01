@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift version
+        run: swift --version
+      - name: Validate project
+        run: ./scripts/validate-project.sh
+      - name: Release build
+        run: swift build -c release
+
+  windows:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile Windows helper
+        shell: powershell
+        run: dotnet build .\windows\CodexOpenPEHotkey.Windows.csproj -c Release
+      - name: Validate Windows helper
+        shell: powershell
+        run: .\scripts\windows\validate.ps1
