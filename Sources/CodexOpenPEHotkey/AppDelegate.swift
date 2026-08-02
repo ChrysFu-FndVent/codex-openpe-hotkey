@@ -6,7 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var hotKeyController: HotKeyController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        requestAccessibilityPermission()
+        let accessibilityTrusted = AXIsProcessTrusted()
 
         do {
             let configuration = try RuntimeConfiguration(
@@ -17,7 +17,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let controller = HotKeyController(configuration: configuration)
             try controller.start()
             hotKeyController = controller
-            Diagnostics.log("started with \(configuration.hotKeyShortcut.displayName)")
+            let accessibilityState = accessibilityTrusted ? "available" : "unavailable"
+            Diagnostics.log(
+                "started with \(configuration.hotKeyShortcut.displayName); accessibility=\(accessibilityState)"
+            )
         } catch {
             Diagnostics.log("startup failed: \(error.localizedDescription)")
             NSSound.beep()
@@ -27,11 +30,5 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         hotKeyController?.stop()
-    }
-
-    private func requestAccessibilityPermission() {
-        let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
-        let options = [promptKey: true] as CFDictionary
-        _ = AXIsProcessTrustedWithOptions(options)
     }
 }

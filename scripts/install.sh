@@ -7,11 +7,12 @@ config_dir="${OPENPE_CONFIG_DIR:-$HOME/.config/openpe}"
 config_file="$config_dir/.env"
 openpe_server_bin="${OPENPE_SERVER_BIN:-}"
 codesign_identity="${CODESIGN_IDENTITY:--}"
-open_settings=true
+codesign_keychain="${CODESIGN_KEYCHAIN:-}"
+local_signing_environment="${OPENPE_LOCAL_SIGNING_ENV:-$HOME/Library/Application Support/CodexOpenPEHotkey/signing/local-signing.env}"
 hotkey=""
 
 usage() {
-  echo "Usage: $0 [--openpe-server PATH] [--app-dir PATH] [--hotkey SHORTCUT] [--no-open-settings]"
+  echo "Usage: $0 [--openpe-server PATH] [--app-dir PATH] [--hotkey SHORTCUT]"
 }
 
 require_value() {
@@ -39,7 +40,7 @@ while [ "$#" -gt 0 ]; do
       shift 2
       ;;
     --no-open-settings)
-      open_settings=false
+      # Retained as a no-op for compatibility with earlier releases.
       shift
       ;;
     -h|--help)
@@ -144,6 +145,27 @@ if [ ! -f "$config_file" ]; then
   exit 1
 fi
 
+if [ "$codesign_identity" = "-" ] && [ -f "$local_signing_environment" ]; then
+  # This file contains paths and an identity name only; the password stays in a 0600 file.
+  # shellcheck disable=SC1090
+  source "$local_signing_environment"
+  codesign_identity="${OPENPE_CODESIGN_IDENTITY:?Missing OPENPE_CODESIGN_IDENTITY}"
+  codesign_keychain="${OPENPE_CODESIGN_KEYCHAIN:?Missing OPENPE_CODESIGN_KEYCHAIN}"
+  codesign_password_file="${OPENPE_CODESIGN_PASSWORD_FILE:?Missing OPENPE_CODESIGN_PASSWORD_FILE}"
+  if [ ! -f "$codesign_keychain" ] || [ ! -f "$codesign_password_file" ]; then
+    echo "Local signing configuration is incomplete: $local_signing_environment" >&2
+    exit 1
+  fi
+  IFS= read -r codesign_password < "$codesign_password_file"
+  /usr/bin/security unlock-keychain -p "$codesign_password" "$codesign_keychain"
+  unset codesign_password
+  if ! /usr/bin/security find-identity -p codesigning -v "$codesign_keychain" 2>/dev/null |
+       /usr/bin/grep -Fq "\"$codesign_identity\""; then
+    echo "Stable signing identity is unavailable: $codesign_identity" >&2
+    exit 1
+  fi
+fi
+
 swift build -c release --package-path "$project_root"
 binary_dir="$(swift build -c release --show-bin-path --package-path "$project_root")"
 source_binary="$binary_dir/OpenPEHotkey"
@@ -160,8 +182,16 @@ mkdir -p "$staged_bundle/Contents/MacOS"
 cp "$source_binary" "$staged_bundle/Contents/MacOS/OpenPEHotkey"
 cp "$project_root/config/Info.plist" "$staged_bundle/Contents/Info.plist"
 chmod 755 "$staged_bundle/Contents/MacOS/OpenPEHotkey"
-/usr/bin/codesign --force --deep --sign "$codesign_identity" "$staged_bundle"
+if [ -n "$codesign_keychain" ]; then
+  /usr/bin/codesign --force --deep --sign "$codesign_identity" --keychain "$codesign_keychain" "$staged_bundle"
+else
+  /usr/bin/codesign --force --deep --sign "$codesign_identity" "$staged_bundle"
+fi
 /usr/bin/codesign --verify --deep --strict "$staged_bundle"
+
+user_domain="gui/$(id -u)"
+/bin/launchctl bootout "$user_domain/com.openpe.promptenhancer.hotkey" >/dev/null 2>&1 || true
+/bin/launchctl bootout "$user_domain/com.openpe.promptenhancer.server" >/dev/null 2>&1 || true
 
 mkdir -p "$app_parent"
 if [ -e "$bundle" ]; then
@@ -190,28 +220,52 @@ hotkey_plist="$launch_agents_dir/com.openpe.promptenhancer.hotkey.plist"
 cp "$project_root/launchd/com.openpe.promptenhancer.server.plist" "$server_plist"
 cp "$project_root/launchd/com.openpe.promptenhancer.hotkey.plist" "$hotkey_plist"
 
-/usr/bin/plutil -replace ProgramArguments.0 -string "$support_dir/openpe-server-launcher" "$server_plist"
+/usr/libexec/PlistBuddy -c "Set :ProgramArguments:0 $support_dir/openpe-server-launcher" "$server_plist"
 /usr/bin/plutil -replace StandardOutPath -string "$logs_dir/openpe-server.log" "$server_plist"
 /usr/bin/plutil -replace StandardErrorPath -string "$logs_dir/openpe-server-error.log" "$server_plist"
-/usr/bin/plutil -replace ProgramArguments.0 -string "$bundle/Contents/MacOS/OpenPEHotkey" "$hotkey_plist"
+/usr/libexec/PlistBuddy -c "Set :ProgramArguments:0 $bundle/Contents/MacOS/OpenPEHotkey" "$hotkey_plist"
 /usr/bin/plutil -replace EnvironmentVariables.OPENPE_HOTKEY -string "$hotkey" "$hotkey_plist"
 /usr/bin/plutil -replace StandardOutPath -string "$logs_dir/openpe-hotkey.log" "$hotkey_plist"
 /usr/bin/plutil -replace StandardErrorPath -string "$logs_dir/openpe-hotkey-error.log" "$hotkey_plist"
 /usr/bin/plutil -lint "$server_plist" "$hotkey_plist" >/dev/null
 
-user_domain="gui/$(id -u)"
-/bin/launchctl bootout "$user_domain/com.openpe.promptenhancer.hotkey" >/dev/null 2>&1 || true
-/bin/launchctl bootout "$user_domain/com.openpe.promptenhancer.server" >/dev/null 2>&1 || true
-/bin/launchctl bootstrap "$user_domain" "$server_plist"
-/bin/launchctl bootstrap "$user_domain" "$hotkey_plist"
+if [ "$(/usr/bin/plutil -extract ProgramArguments raw "$server_plist")" != 1 ] ||
+   [ "$(/usr/bin/plutil -extract ProgramArguments.0 raw "$server_plist")" != "$support_dir/openpe-server-launcher" ]; then
+  echo "Invalid ProgramArguments in $server_plist" >&2
+  exit 1
+fi
+if [ "$(/usr/bin/plutil -extract ProgramArguments raw "$hotkey_plist")" != 1 ] ||
+   [ "$(/usr/bin/plutil -extract ProgramArguments.0 raw "$hotkey_plist")" != "$bundle/Contents/MacOS/OpenPEHotkey" ]; then
+  echo "Invalid ProgramArguments in $hotkey_plist" >&2
+  exit 1
+fi
+
+bootstrap_agent() {
+  local label="$1"
+  local plist="$2"
+  local attempt
+  for attempt in 1 2 3; do
+    if /bin/launchctl bootstrap "$user_domain" "$plist" >/dev/null 2>&1 &&
+       /bin/launchctl print "$user_domain/$label" >/dev/null 2>&1; then
+      return 0
+    fi
+    /bin/launchctl bootout "$user_domain/$label" >/dev/null 2>&1 || true
+    /bin/sleep 1
+  done
+  echo "Failed to load LaunchAgent after 3 attempts: $label" >&2
+  return 1
+}
+
+bootstrap_agent com.openpe.promptenhancer.server "$server_plist"
+bootstrap_agent com.openpe.promptenhancer.hotkey "$hotkey_plist"
 
 if [ "$codesign_identity" = "-" ]; then
   echo "The app uses an ad-hoc signature. macOS may require Accessibility approval after updates."
-fi
-if [ "$open_settings" = true ]; then
-  open 'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility'
+  echo "Run scripts/setup-local-signing.sh once to create a stable local identity."
+else
+  echo "Signing identity: $codesign_identity"
 fi
 
 echo "Installed $bundle"
 echo "Configured hotkey: $hotkey"
-echo "Enable OpenPE Hotkey in Privacy & Security > Accessibility, then run scripts/status.sh."
+echo "Run scripts/status.sh to verify the helper and its actual Accessibility state."

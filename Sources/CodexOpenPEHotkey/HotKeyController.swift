@@ -126,7 +126,7 @@ final class HotKeyController {
     }
 
     private func startProgressTimer(for session: ActiveSession) {
-        let timer = Timer(timeInterval: 0.35, repeats: true) { [weak self, weak session] _ in
+        let timer = Timer(timeInterval: 1, repeats: true) { [weak self, weak session] _ in
             guard let self, let session, self.activeSession === session else { return }
             self.updateProgress(for: session)
         }
@@ -165,9 +165,6 @@ final class HotKeyController {
 
         switch result {
         case .success(let enhancedPrompt):
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(enhancedPrompt, forType: .string)
-
             let sameApplication = NSWorkspace.shared.frontmostApplication?.processIdentifier ==
                 session.expectedProcessIdentifier
             if session.inlineActive, sameApplication,
@@ -177,6 +174,8 @@ final class HotKeyController {
                 if session.inlineActive {
                     _ = session.slot.restoreOriginalText()
                 }
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(enhancedPrompt, forType: .string)
                 Diagnostics.log("enhanced text copied; inline replacement skipped")
                 NSSound.beep()
             }
