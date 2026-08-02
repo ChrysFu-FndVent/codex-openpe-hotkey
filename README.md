@@ -1,3 +1,15 @@
+<!-- README-ARCHITECT: visual-shell -->
+<p align="center">
+  <img src="assets/readme/codex-openpe-hotkey-banner.svg" alt="codex-openpe-hotkey project banner" width="100%" />
+</p>
+<p align="center">
+  <a href="https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/ChrysFu-FndVent/codex-openpe-hotkey?style=for-the-badge&amp;logo=github" /></a>
+  <a href="https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/commits/main"><img alt="Last commit" src="https://img.shields.io/github/last-commit/ChrysFu-FndVent/codex-openpe-hotkey?style=for-the-badge" /></a>
+  <a href="https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/search?l=C#"><img alt="Top language" src="https://img.shields.io/github/languages/top/ChrysFu-FndVent/codex-openpe-hotkey?style=for-the-badge" /></a>
+  <a href="https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/ChrysFu-FndVent/codex-openpe-hotkey?style=for-the-badge" /></a>
+</p>
+<!-- README-ARCHITECT: visual-shell end -->
+
 <a id="readme-top"></a>
 
 <div align="right"><a href="#简体中文">简体中文</a> | <a href="#english">English</a></div>
