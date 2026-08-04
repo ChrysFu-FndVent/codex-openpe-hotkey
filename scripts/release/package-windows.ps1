@@ -26,7 +26,7 @@ if ($LASTEXITCODE -ne 0) { throw "Windows setup wizard build failed." }
 New-Item -ItemType Directory -Path $artifactDirectory -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $projectRoot "windows\bin\Release\net48\CodexOpenPEHotkey.Windows.dll") `
     -Destination $artifactDirectory -Force
-Copy-Item -LiteralPath (Join-Path $projectRoot "windows\bin\Release\net48\CodexOpenPEHotkey.Setup.exe") `
+Copy-Item -LiteralPath (Join-Path $projectRoot "windows\bin\Setup\Release\net48\CodexOpenPEHotkey.Setup.exe") `
     -Destination $artifactDirectory -Force
 
 if ([string]::IsNullOrWhiteSpace($IsccPath)) {
