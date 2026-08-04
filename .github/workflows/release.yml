@@ -75,7 +75,7 @@ jobs:
         with:
           name: windows-release
           path: |
-            dist/*.exe
+            dist/*-Windows-x64-Setup.exe
             dist/*.exe.sha256
           if-no-files-found: error
 
@@ -102,7 +102,7 @@ jobs:
         shell: bash
         run: >-
           gh release create "$GITHUB_REF_NAME"
-          dist/*.dmg dist/*.exe dist/*.sha256
+          dist/*.dmg dist/*-Windows-x64-Setup.exe dist/*.sha256
           --repo "$GITHUB_REPOSITORY"
           --verify-tag
           --title "Codex OpenPE Hotkey $GITHUB_REF_NAME"
