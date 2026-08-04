@@ -46,7 +46,8 @@ foreach ($required in @(
 if (-not (Test-Path -LiteralPath $startupShortcut)) { throw "Startup shortcut is missing." }
 
 $assembly = Join-Path $installDirectory "CodexOpenPEHotkey.Windows.dll"
-Add-Type -Path $assembly
+# Load from bytes so the smoke-test process does not lock the installed DLL during uninstall.
+[Reflection.Assembly]::Load([IO.File]::ReadAllBytes($assembly)) | Out-Null
 [CodexOpenPEHotkey.Windows.SelfTests]::Run()
 [CodexOpenPEHotkey.Windows.CredentialStore]::Write(
     [CodexOpenPEHotkey.Windows.CredentialStore]::ApiKeyTarget,
