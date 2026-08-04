@@ -9,8 +9,6 @@
     <AssemblyVersion>0.4.0.0</AssemblyVersion>
     <FileVersion>0.4.0.0</FileVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <BaseIntermediateOutputPath>obj\Setup\</BaseIntermediateOutputPath>
-    <BaseOutputPath>bin\Setup\</BaseOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="SetupWizard.cs" />
