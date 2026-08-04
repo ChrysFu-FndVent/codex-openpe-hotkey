@@ -8,7 +8,8 @@ Assert-WindowsPlatform
 
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $parseFailed = $false
-Get-ChildItem -LiteralPath $PSScriptRoot -Filter "*.ps1" | ForEach-Object {
+$scriptDirectories = @($PSScriptRoot, (Join-Path $projectRoot "scripts\release"))
+Get-ChildItem -LiteralPath $scriptDirectories -Filter "*.ps1" | ForEach-Object {
     $tokens = $null
     $errors = $null
     [Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null

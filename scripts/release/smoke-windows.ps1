@@ -20,8 +20,8 @@ if ($expectedHash -ne $actualHash) { throw "Windows installer SHA-256 mismatch."
 
 $installDirectory = Join-Path $env:LOCALAPPDATA "Programs\CodexOpenPEHotkey"
 $dataDirectory = Join-Path $env:LOCALAPPDATA "CodexOpenPEHotkey"
-$startupShortcut = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::Startup) `
-    "Codex OpenPE Hotkey.lnk"
+$startupDirectory = [Environment]::GetFolderPath([Environment+SpecialFolder]::Startup)
+$startupShortcut = Join-Path $startupDirectory "Codex OpenPE Hotkey.lnk"
 
 & $Installer /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 if ($LASTEXITCODE -ne 0) { throw "Silent installer failed with exit code $LASTEXITCODE." }
