@@ -1310,6 +1310,7 @@ namespace CodexOpenPEHotkey.Windows
                 RuntimeConfiguration configuration = RuntimeConfiguration.Load(AppPaths.ConfigFile);
                 using (HotKeyApplication application = new HotKeyApplication(configuration))
                 {
+                    UpdateChecker.Schedule("0.4.0");
                     Application.Run(application);
                 }
             }
@@ -1334,6 +1335,79 @@ namespace CodexOpenPEHotkey.Windows
                 mutex.Dispose();
                 mutex = null;
             }
+        }
+    }
+
+    internal static class UpdateChecker
+    {
+        private const string LatestReleaseUrl =
+            "https://api.github.com/repos/ChrysFu-FndVent/codex-openpe-hotkey/releases/latest";
+        private const string ReleasesUrl =
+            "https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/releases/latest";
+        private static readonly string LastCheckFile = Path.Combine(AppPaths.DataDirectory, "last-update-check.txt");
+
+        public static void Schedule(string currentVersion)
+        {
+            DateTime lastCheck;
+            if (File.Exists(LastCheckFile) &&
+                DateTime.TryParse(File.ReadAllText(LastCheckFile), out lastCheck) &&
+                DateTime.UtcNow - lastCheck.ToUniversalTime() < TimeSpan.FromHours(24))
+            {
+                return;
+            }
+            try
+            {
+                File.WriteAllText(LastCheckFile, DateTime.UtcNow.ToString("o"), Encoding.ASCII);
+            }
+            catch
+            {
+                return;
+            }
+
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                try
+                {
+                    using (WebClient client = new WebClient())
+                    {
+                        client.Headers[HttpRequestHeader.UserAgent] =
+                            "Codex-OpenPE-Hotkey/" + currentVersion;
+                        string json = client.DownloadString(LatestReleaseUrl);
+                        Dictionary<string, object> release = new JavaScriptSerializer()
+                            .Deserialize<Dictionary<string, object>>(json);
+                        object tagValue;
+                        object prereleaseValue;
+                        if (!release.TryGetValue("tag_name", out tagValue) ||
+                            (release.TryGetValue("prerelease", out prereleaseValue) &&
+                             Convert.ToBoolean(prereleaseValue)))
+                        {
+                            return;
+                        }
+                        Version current;
+                        Version latest;
+                        if (!Version.TryParse(currentVersion.TrimStart('v', 'V'), out current) ||
+                            !Version.TryParse(tagValue.ToString().TrimStart('v', 'V'), out latest) ||
+                            latest <= current)
+                        {
+                            return;
+                        }
+                        DialogResult answer = MessageBox.Show(
+                            "Codex OpenPE Hotkey " + tagValue +
+                            " is available. Open GitHub Releases to download it?",
+                            "OpenPE Hotkey update",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Information);
+                        if (answer == DialogResult.Yes)
+                        {
+                            Process.Start(new ProcessStartInfo(ReleasesUrl) { UseShellExecute = true });
+                        }
+                    }
+                }
+                catch (Exception error)
+                {
+                    Diagnostics.Log("update check failed: " + error.Message);
+                }
+            });
         }
     }
 

@@ -1,0 +1,107 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.25.0"
+      - name: Validate tag version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            test "${GITHUB_REF_NAME#v}" = "$(tr -d '[:space:]' < release/version.txt)"
+          fi
+      - name: Validate project
+        run: ./scripts/validate-project.sh
+      - name: Build pinned openPE
+        run: ./scripts/release/build-openpe.sh
+      - name: Build universal DMG
+        run: ./scripts/release/package-macos.sh
+      - name: Smoke-test DMG
+        run: ./scripts/release/smoke-macos.sh
+      - uses: actions/upload-artifact@v7
+        with:
+          name: macos-release
+          path: |
+            dist/*.dmg
+            dist/*.dmg.sha256
+          if-no-files-found: error
+
+  windows:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.25.0"
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "8.0.x"
+      - name: Validate tag version
+        shell: powershell
+        run: |
+          $version = (Get-Content .\release\version.txt -Raw).Trim()
+          if ($env:GITHUB_REF.StartsWith("refs/tags/") -and
+              $env:GITHUB_REF_NAME.TrimStart('v') -ne $version) {
+              throw "Tag/version mismatch."
+          }
+      - name: Validate Windows sources
+        shell: powershell
+        run: .\scripts\windows\validate.ps1
+      - name: Install Inno Setup
+        shell: powershell
+        run: choco install innosetup --yes --no-progress
+      - name: Build Windows installer
+        shell: powershell
+        run: .\scripts\release\package-windows.ps1
+      - name: Smoke-test Windows installer
+        shell: powershell
+        run: .\scripts\release\smoke-windows.ps1
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-release
+          path: |
+            dist/*.exe
+            dist/*.exe.sha256
+          if-no-files-found: error
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [macos, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: "*-release"
+          path: dist
+          merge-multiple: true
+      - name: Verify release checksums
+        shell: bash
+        run: |
+          cd dist
+          for checksum in *.sha256; do sha256sum -c "$checksum"; done
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          dist/*.dmg dist/*.exe dist/*.sha256
+          --repo "$GITHUB_REPOSITORY"
+          --verify-tag
+          --title "Codex OpenPE Hotkey $GITHUB_REF_NAME"
+          --generate-notes

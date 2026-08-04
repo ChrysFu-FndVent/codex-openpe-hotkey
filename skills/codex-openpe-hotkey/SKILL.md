@@ -22,13 +22,13 @@ Set `skill_dir` to the directory containing this `SKILL.md`, then resolve the pl
 ## Install
 
 1. Read the root `README.md` before changing the installation.
-2. Confirm the platform prerequisites and an executable `openpe-server` are available.
-3. Preserve existing OpenPE and hotkey configuration unless the user explicitly requests reconfiguration. Do not reset a custom shortcut to its platform default during maintenance.
-4. Never print, read back, log, or place API keys or bearer tokens on a command line.
-5. On macOS, run `scripts/configure.sh` when needed, run `scripts/setup-local-signing.sh` once, then run `scripts/install.sh`. The local signing identity keeps the Accessibility code requirement stable across updates. Ask the user to authorize `OpenPE Hotkey` only after `scripts/status.sh` reports `accessibility: unavailable`; do not infer permission from the System Settings toggle alone.
-6. On Windows, run `scripts/windows/install.ps1`; it prompts for the API key, stores credentials in Windows Credential Manager, and creates a per-user Startup shortcut. Do not request administrator elevation.
-7. Run the platform status script and require the helper process, local `/healthz`, and hidden-background configuration to pass.
-8. Have the user select a harmless prompt in Codex, press the platform hotkey, keep Codex focused, and confirm inline progress is replaced by an enhanced prompt.
+2. For regular users, prefer the matching installer from the latest GitHub Release. It bundles the pinned `openpe-server`, Plugin/Skill, and Helper. On unsigned builds, follow the README's macOS **Open Anyway** or Windows SmartScreen **More info → Run anyway** steps; do not disable system-wide security controls.
+3. Use the source scripts only for development, diagnosis, or when the user explicitly prefers source installation. Confirm the platform prerequisites and an executable `openpe-server` before using that path.
+4. Preserve existing OpenPE and hotkey configuration unless the user explicitly requests reconfiguration. Do not reset a custom shortcut to its platform default during maintenance.
+5. Never print, read back, log, or place API keys or bearer tokens on a command line.
+6. On macOS source installations, run `scripts/configure.sh` when needed, run `scripts/setup-local-signing.sh` once, then run `scripts/install.sh`. Ask the user to authorize `OpenPE Hotkey` only after `scripts/status.sh` reports `accessibility: unavailable`; do not infer permission from the System Settings toggle alone.
+7. On Windows source installations, run `scripts/windows/install.ps1`; it stores credentials in Windows Credential Manager and creates a per-user Startup shortcut. Do not request administrator elevation.
+8. Require the installer health check or platform status script to pass, then have the user select a harmless prompt in Codex, press the platform hotkey, keep Codex focused, and confirm inline progress is replaced by an enhanced prompt.
 
 Do not claim completion before the real Codex composer test succeeds.
 

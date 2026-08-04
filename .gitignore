@@ -8,3 +8,5 @@ runtime.env
 windows/bin/
 windows/obj/
 .readme-architect/
+dist/
+artifacts/

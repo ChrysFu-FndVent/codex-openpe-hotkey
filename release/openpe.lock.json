@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/AoManoh/openpe.git",
+  "commit": "afee8703f9ace4b36123ba574e7b9339807b32e7",
+  "goVersion": "1.25.0",
+  "license": "MIT"
+}

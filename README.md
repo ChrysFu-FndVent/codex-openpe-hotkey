@@ -26,7 +26,7 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 
 <p>
   <a href="https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/ChrysFu-FndVent/codex-openpe-hotkey/ci.yml?branch=main&style=for-the-badge&label=CI&labelColor=24292F" alt="CI status" /></a>
-  <img src="https://img.shields.io/badge/version-0.3.1-0969DA?style=for-the-badge&labelColor=24292F" alt="Version 0.3.1" />
+  <img src="https://img.shields.io/badge/version-0.4.0-0969DA?style=for-the-badge&labelColor=24292F" alt="Version 0.4.0" />
   <img src="https://img.shields.io/badge/macOS-13%2B-24292F?style=for-the-badge&logo=apple&logoColor=white" alt="macOS 13 or later" />
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292F" alt="Windows 10 or 11" />
   <img src="https://img.shields.io/badge/Codex-Plugin%20%2B%20Skill-0969DA?style=for-the-badge&logo=openai&logoColor=white&labelColor=24292F" alt="Codex plugin and Skill" />
@@ -34,7 +34,7 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
   <a href="https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/stargazers"><img src="https://img.shields.io/github/stars/ChrysFu-FndVent/codex-openpe-hotkey?style=for-the-badge&color=9A6700&labelColor=24292F" alt="GitHub stars" /></a>
 </p>
 
-[快速使用](#zh-usage) · [自定义快捷键](#zh-hotkey) · [安装](#zh-getting-started) · [English](#english)
+[下载 Release](https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/releases/latest) · [演示](#zh-demo) · [快速使用](#zh-usage) · [一键安装](#zh-release-install) · [自定义快捷键](#zh-hotkey) · [English](#english)
 
 </div>
 
@@ -63,15 +63,79 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 | macOS 13+ | `Option+Q` | `Command`、`Control`、`Option`、`Shift` + 字母、数字或 `F1`–`F12` |
 | Windows 10/11 | `Alt+Q` | `Ctrl`、`Alt`、`Shift`、`Win` + 字母、数字或 `F1`–`F12` |
 
+<a id="zh-release-install"></a>
+
+### 📦 从 Release 一键安装
+
+前往 [GitHub Releases](https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/releases/latest)，下载与系统对应的安装包。安装包已内置固定版本的 `openpe-server`、Codex Plugin/Skill 和平台 Helper；普通用户不需要安装 Git、Go、Swift 或手动运行脚本。
+
+| 平台 | 下载文件 | 安装步骤 |
+| --- | --- | --- |
+| **macOS Apple Silicon / Intel** | `Codex-OpenPE-Hotkey-0.4.0-macOS-universal.dmg` | 打开 DMG，双击 `OpenPE Hotkey.app`；应用会复制到 `~/Applications` 并启动配置向导 |
+| **Windows x64** | `Codex-OpenPE-Hotkey-0.4.0-Windows-x64-Setup.exe` | 双击 EXE，按安装器提示完成当前用户安装；无需管理员权限 |
+
+> [!WARNING]
+> `v0.4.0` 没有 Apple Developer ID 或 Windows 代码签名证书。请只从本仓库的 GitHub Release 下载，并先核对同一 Release 中的 `.sha256` 文件。
+
+<details>
+<summary><strong>核对 SHA-256</strong></summary>
+
+macOS（安装包与 `.sha256` 文件位于同一目录）：
+
+```bash
+shasum -a 256 -c Codex-OpenPE-Hotkey-0.4.0-macOS-universal.dmg.sha256
+```
+
+Windows PowerShell：
+
+```powershell
+Get-FileHash .\Codex-OpenPE-Hotkey-0.4.0-Windows-x64-Setup.exe -Algorithm SHA256
+Get-Content .\Codex-OpenPE-Hotkey-0.4.0-Windows-x64-Setup.exe.sha256
+```
+
+两行哈希值必须完全一致。
+
+</details>
+
+#### macOS 首次打开
+
+1. 如果 macOS 阻止启动，打开 **系统设置 → 隐私与安全性**，在“安全性”区域找到 `OpenPE Hotkey.app`，点击 **仍要打开**，验证后再次确认打开。
+2. 在配置向导中填写 OpenAI-compatible API key、API base URL、模型和快捷键；默认快捷键为 `Option+Q`。API key 只会写入 macOS Keychain。
+3. 点击 **Install**。向导会安装内置 Codex Plugin/Skill、创建后台 LaunchAgent、启动 openPE 并检查 `/healthz`。
+4. 在 **系统设置 → 隐私与安全性 → 辅助功能** 中启用 `OpenPE Hotkey`。未签名版本更新后，macOS 可能要求重新授权一次。
+5. 需要重新配置时运行：
+
+   ```bash
+   open -a "$HOME/Applications/OpenPE Hotkey.app" --args --setup
+   ```
+6. 完整卸载（包括 Plugin 与本机凭据）：
+
+   ```bash
+   /bin/bash "$HOME/Applications/OpenPE Hotkey.app/Contents/Resources/uninstall.sh" --remove-plugin --purge-secrets
+   ```
+
+#### Windows 首次打开
+
+1. 如果 Microsoft Defender SmartScreen 阻止启动，选择 **更多信息 → 仍要运行**。
+2. 安装完成后，WinForms 配置向导会自动打开。填写 API key、API base URL、模型和快捷键；默认快捷键为 `Alt+Q`。API key 只会写入 Windows Credential Manager。
+3. 点击 **Install**。向导会安装内置 Codex Plugin/Skill、启动后台 Helper 与 openPE，并检查 `/healthz`；安装器同时创建当前用户的 Startup 快捷方式。
+4. 需要重新配置时，从开始菜单打开 **Configure Codex OpenPE Hotkey**。
+5. 卸载时使用 Windows 的“已安装的应用”或开始菜单中的 **Uninstall Codex OpenPE Hotkey**；卸载器会移除 Plugin、Startup、配置、日志和凭据。
+
+两端完成后都必须在真实 Codex 输入框中选中一段提示词并按快捷键。看到输入框内动态进度，随后被优化结果原地替换，才表示最终配置成功。
+
 <details>
 <summary><strong>目录</strong></summary>
 
+- [从 Release 一键安装](#zh-release-install)
 - [核心能力](#zh-features)
+- [输入框内进度演示](#zh-demo)
 - [在 Codex 中快速使用](#zh-usage)
+- [用户配置流程与注意事项](#zh-setup-flow)
 - [自定义快捷键](#zh-hotkey)
 - [工作方式](#zh-architecture)
 - [组件与插件](#zh-components)
-- [快速开始](#zh-getting-started)
+- [从源码安装与开发](#zh-getting-started)
 - [配置参考](#zh-configuration)
 - [安全边界](#zh-security)
 - [故障排查](#zh-troubleshooting)
@@ -92,6 +156,9 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 | **可见生成进度**：展示阶段、动画和已用秒数 | **失败恢复**：失败或超时尽力恢复原文，必要时回退到剪贴板 |
 | **双平台快捷键**：Carbon 与 Win32 `RegisterHotKey` | **本地安全边界**：只连接 loopback，并使用 bearer token |
 | **快捷键可自定义**：支持修饰键与字母、数字、功能键组合 | **Codex 插件工作流**：Skill 协助安装、诊断、验证和卸载 |
+| **版本提醒**：每天最多检查一次 GitHub Release，不自动安装 | **可复现发布**：内置 openPE 固定到记录的上游 commit，并提供 SHA-256 |
+
+<a id="zh-demo"></a>
 
 输入框中的进度示例：
 
@@ -100,6 +167,12 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 [OpenPE ⠴] 仍在生成 20s
 [OpenPE ⠧] 网络较慢 50s
 ```
+
+<p align="center">
+  <img src="assets/readme/inline-progress-demo.gif" alt="OpenPE 在完整 Codex 输入框内动态显示正在优化、仍在生成和网络较慢" width="100%" />
+</p>
+
+上方 GIF 在完整 Codex 输入框中加速展示了真实的三段进度状态。触发快捷键后，插件会在当前选区内直接更新动画符号、处理阶段和已用秒数；优化完成后，这段进度会被生成结果原地替换。因此无需查看悬浮窗，也能直观判断任务仍在生成还是网络响应较慢。
 
 <p align="right">(<a href="#readme-top">返回顶部</a>)</p>
 
@@ -115,11 +188,61 @@ Inline prompt enhancement for Codex, triggered by a configurable desktop shortcu
 
 如果处理期间切换窗口或改变选区，后台程序会避免向错误位置写入，并在可能时恢复原文。原地替换成功时会恢复操作前的剪贴板；无法安全写回时，优化结果会保留在剪贴板中。
 
+<a id="zh-setup-flow"></a>
+
+### 🧭 用户配置流程与注意事项
+
+> [!IMPORTANT]
+> 本项目不是需要写入 `~/.codex/config.toml` 的 MCP Server。Codex Plugin/Skill 负责发现和指导安装；真正的全局快捷键、输入框内进度和文字替换由平台 Helper 完成；提示词优化由本地 `openpe-server` 完成。
+
+#### 可选流程：让 Codex Skill 协助源码配置
+
+对普通用户，优先使用[从 Release 一键安装](#zh-release-install)。以下流程适合开发、诊断或希望由 Codex 操作源码脚本的用户。
+
+1. 在终端中从公开 GitHub 仓库添加 Marketplace 并安装插件：
+
+   ```bash
+   codex plugin marketplace add ChrysFu-FndVent/codex-openpe-hotkey --ref main
+   codex plugin add codex-openpe-hotkey@codex-openpe-hotkey
+   ```
+
+2. 新建一个 Codex 任务，使新安装的 Skill 被当前任务发现，然后输入：
+
+   ```text
+   $codex-openpe-hotkey 帮我安装并验证当前系统的 OpenPE 快捷键
+   ```
+
+3. 允许该任务执行安装所需的本机操作。安装会访问 Keychain 或 Windows Credential Manager、用户级启动项、日志目录和应用安装目录；如果 Codex 使用受限沙箱，请在它请求时批准相应操作或使用“完全访问”。
+4. 按 Skill 指引准备 `openpe-server`，并在本机安全提示中输入自己的 OpenAI-compatible API key。不要把 API key 粘贴到 Codex 对话、命令参数、README、Issue 或日志中。
+5. 完成平台安装：macOS 首次运行稳定签名版本时需要授予一次辅助功能权限；Windows 使用 Windows PowerShell 5.1 和用户级 Startup 快捷方式，无需管理员权限，也不要在 WSL 或 PowerShell 7 中运行。
+6. 运行平台状态脚本，并在真实 Codex 输入框中完成最终测试。只有输入框先显示动态进度、随后被优化结果替换，才算安装完成。
+
+手动配置时，请先克隆仓库并在项目根目录执行[快速开始](#zh-getting-started)中的平台命令；通过 Skill 配置时，Skill 会自行解析已安装插件的目录，无需手动进入 Codex 插件缓存路径。
+
+#### 配置前必读
+
+| 项目 | 用户需要确认的事项 |
+| --- | --- |
+| **Codex 版本** | `codex plugin --help` 应能看到 `add`、`list` 和 `marketplace`；若没有，请先更新 Codex 桌面版 |
+| **Codex 插件** | `codex plugin list` 应显示 `codex-openpe-hotkey@codex-openpe-hotkey` 为 `installed, enabled`，版本应与当前发布版一致（当前为 `0.4.0`） |
+| **API key** | 只在本机脚本的安全提示中输入；macOS 保存到 Keychain，Windows 保存到 Credential Manager |
+| **系统权限** | macOS 仅在 `scripts/status.sh` 报告 `accessibility: unavailable` 时添加并启用 `OpenPE Hotkey.app`；不要反复打开系统设置 |
+| **快捷键冲突** | 若默认 `Option+Q` 或 `Alt+Q` 已被占用，请先改用其他带修饰键的组合，再重新检查状态 |
+| **本地服务** | 状态脚本必须确认 Helper 正在运行、`/healthz` 正常、签名/后台启动配置有效 |
+| **最终验收** | 必须在真实 Codex 输入框选中文字并按快捷键，确认动态进度出现且最终结果原地替换；CI 通过不能代替本机 UI 验收 |
+
+> [!NOTE]
+> macOS 已完成真实 Codex 输入框端到端验证。Windows 的构建和自动化自检由 GitHub Actions 覆盖，但每位 Windows 用户仍需在自己的 Codex 桌面版中完成 UI Automation 端到端测试。
+
+<p align="right">(<a href="#readme-top">返回顶部</a>)</p>
+
 <a id="zh-hotkey"></a>
 
 ### ⌨️ 自定义快捷键
 
 快捷键不区分大小写，必须包含至少一个修饰键和一个普通按键。不允许无修饰键的 `Q`、重复修饰键或未支持的按键。
+
+Release 用户可以重新打开平台配置向导并修改 **Hotkey** 字段：macOS 使用上方 `open ... --setup` 命令，Windows 从开始菜单打开配置工具。源码安装用户也可以使用以下命令。
 
 macOS：
 
@@ -171,6 +294,7 @@ Windows：
 | **Codex Skill** | [`skills/codex-openpe-hotkey/SKILL.md`](skills/codex-openpe-hotkey/SKILL.md) | 指导 Codex 安装、配置、诊断、验证和卸载 |
 | **macOS Helper** | [`Sources/CodexOpenPEHotkey/`](Sources/CodexOpenPEHotkey/) | Carbon 全局快捷键、Accessibility 选区操作和输入框内进度 |
 | **Windows Helper** | [`windows/OpenPEHotkey.Windows.cs`](windows/OpenPEHotkey.Windows.cs) | Win32 快捷键、UI Automation、后台启动和进度替换 |
+| **原生配置向导** | [`Sources/CodexOpenPEHotkey/SetupWindowController.swift`](Sources/CodexOpenPEHotkey/SetupWindowController.swift)、[`windows/SetupWizard.cs`](windows/SetupWizard.cs) | 安全收集本机配置、安装 Plugin/Skill、启动服务并执行健康检查 |
 | **openPE Server** | [AoManoh/openpe](https://github.com/AoManoh/openpe) | 在本地提供提示词增强 API 并连接已配置模型网关 |
 
 <p align="center">
@@ -187,12 +311,15 @@ Windows：
 
 <a id="zh-getting-started"></a>
 
-### 🚀 快速开始
+### 🚀 从源码安装与开发
+
+> [!NOTE]
+> 本节面向开发者。Release 安装包已经内置 openPE、Plugin/Skill 和 Helper，普通用户无需执行以下构建步骤。
 
 #### 1. 公共依赖
 
 - Codex 或 ChatGPT 桌面版
-- [Git](https://git-scm.com/)（使用 Git clone 时）
+- [Git](https://git-scm.com/)（克隆仓库或从远程 Git Marketplace 安装插件时）
 - [Go 1.25+](https://go.dev/dl/)（从源码构建当前 openPE）
 - 一个可用的 OpenAI-compatible API key、网关和模型
 
@@ -226,7 +353,7 @@ Set-Location .\codex-openpe-hotkey
 
 #### 3. 从 GitHub 安装 Codex 插件
 
-仓库发布后运行：
+使用源码方式安装插件：
 
 ```bash
 codex plugin marketplace add ChrysFu-FndVent/codex-openpe-hotkey --ref main
@@ -378,6 +505,7 @@ Windows PowerShell：
 
 ```powershell
 dotnet build .\windows\CodexOpenPEHotkey.Windows.csproj -c Release
+dotnet build .\windows\CodexOpenPEHotkey.Setup.csproj -c Release
 .\scripts\windows\validate.ps1
 ```
 
@@ -397,8 +525,11 @@ GitHub Actions 会分别在 macOS 和 Windows runner 上构建对应实现。发
 ├── Sources/                               # macOS Swift 后台程序
 ├── Tests/CoreSelfTests/                   # macOS 核心自检
 ├── windows/                               # Windows .NET Framework 后台程序
+├── installer/windows/                     # Windows Inno Setup 安装器
 ├── scripts/                               # macOS 安装和维护脚本
 ├── scripts/windows/                       # Windows 安装和维护脚本
+├── scripts/release/                       # 固定依赖、打包和安装烟雾测试
+├── release/                               # 发布版本和 openPE commit 锁定
 ├── launchd/                               # macOS LaunchAgent 模板
 ├── skills/codex-openpe-hotkey/            # Codex Skill
 └── assets/readme/                         # README 架构图源文件与导出图
@@ -445,15 +576,79 @@ Default shortcuts:
 | macOS 13+ | `Option+Q` | `Command`, `Control`, `Option`, `Shift` + a letter, digit, or `F1`–`F12` |
 | Windows 10/11 | `Alt+Q` | `Ctrl`, `Alt`, `Shift`, `Win` + a letter, digit, or `F1`–`F12` |
 
+<a id="en-release-install"></a>
+
+### 📦 One-Click Installation from Releases
+
+Open [GitHub Releases](https://github.com/ChrysFu-FndVent/codex-openpe-hotkey/releases/latest) and download the installer for your system. Each installer bundles the pinned `openpe-server`, Codex Plugin/Skill, and platform helper. Regular users do not need Git, Go, Swift, or manual scripts.
+
+| Platform | Download | Installation |
+| --- | --- | --- |
+| **macOS Apple Silicon / Intel** | `Codex-OpenPE-Hotkey-0.4.0-macOS-universal.dmg` | Open the DMG and double-click `OpenPE Hotkey.app`; it copies itself to `~/Applications` and opens the setup wizard |
+| **Windows x64** | `Codex-OpenPE-Hotkey-0.4.0-Windows-x64-Setup.exe` | Run the EXE and follow the per-user installer; administrator privileges are not required |
+
+> [!WARNING]
+> `v0.4.0` is not signed with an Apple Developer ID or Windows code-signing certificate. Download it only from this repository's GitHub Release and verify the matching `.sha256` file first.
+
+<details>
+<summary><strong>Verify SHA-256</strong></summary>
+
+macOS, with the installer and `.sha256` file in the same directory:
+
+```bash
+shasum -a 256 -c Codex-OpenPE-Hotkey-0.4.0-macOS-universal.dmg.sha256
+```
+
+Windows PowerShell:
+
+```powershell
+Get-FileHash .\Codex-OpenPE-Hotkey-0.4.0-Windows-x64-Setup.exe -Algorithm SHA256
+Get-Content .\Codex-OpenPE-Hotkey-0.4.0-Windows-x64-Setup.exe.sha256
+```
+
+The two hash values must match exactly.
+
+</details>
+
+#### First launch on macOS
+
+1. If macOS blocks the app, open **System Settings → Privacy & Security**, find `OpenPE Hotkey.app` in the Security section, click **Open Anyway**, authenticate, and confirm the second prompt.
+2. Enter the OpenAI-compatible API key, API base URL, model, and shortcut in the wizard. The default is `Option+Q`. The API key is written only to macOS Keychain.
+3. Click **Install**. The wizard installs the bundled Codex Plugin/Skill, creates background LaunchAgents, starts openPE, and checks `/healthz`.
+4. Enable `OpenPE Hotkey` under **System Settings → Privacy & Security → Accessibility**. macOS may request authorization again after an unsigned update.
+5. To reconfigure later, run:
+
+   ```bash
+   open -a "$HOME/Applications/OpenPE Hotkey.app" --args --setup
+   ```
+6. To remove the app, Plugin, and local credentials completely:
+
+   ```bash
+   /bin/bash "$HOME/Applications/OpenPE Hotkey.app/Contents/Resources/uninstall.sh" --remove-plugin --purge-secrets
+   ```
+
+#### First launch on Windows
+
+1. If Microsoft Defender SmartScreen blocks the installer, choose **More info → Run anyway**.
+2. The WinForms setup wizard opens after installation. Enter the API key, API base URL, model, and shortcut. The default is `Alt+Q`. The API key is written only to Windows Credential Manager.
+3. Click **Install**. The wizard installs the bundled Codex Plugin/Skill, starts the background helper and openPE, and checks `/healthz`; the installer also creates a per-user Startup shortcut.
+4. To reconfigure later, open **Configure Codex OpenPE Hotkey** from the Start menu.
+5. Uninstall through Windows Installed apps or **Uninstall Codex OpenPE Hotkey** in the Start menu. The uninstaller removes the Plugin, Startup entry, configuration, logs, and credentials.
+
+On both platforms, finish by selecting a prompt in the real Codex composer and pressing the shortcut. Final setup is successful only when inline progress appears and is then replaced by the enhanced prompt.
+
 <details>
 <summary><strong>Table of Contents</strong></summary>
 
+- [One-Click Installation from Releases](#en-release-install)
 - [Features](#en-features)
+- [Inline Progress Demo](#en-demo)
 - [Quick Use in Codex](#en-usage)
+- [User Setup Flow and Important Notes](#en-setup-flow)
 - [Custom Hotkeys](#en-hotkey)
 - [Architecture](#en-architecture)
 - [Components and Plugins](#en-components)
-- [Getting Started](#en-getting-started)
+- [Install and Develop from Source](#en-getting-started)
 - [Configuration](#en-configuration)
 - [Security Boundaries](#en-security)
 - [Troubleshooting](#en-troubleshooting)
@@ -474,6 +669,9 @@ Default shortcuts:
 | **Visible progress**: shows stage, animation, and elapsed seconds | **Failure recovery**: restores source text when possible and falls back to the clipboard |
 | **Cross-platform hotkeys**: Carbon and Win32 `RegisterHotKey` | **Local boundary**: accepts only loopback endpoints and uses bearer authentication |
 | **Custom shortcuts**: combines modifiers with letters, digits, or function keys | **Codex plugin workflow**: the Skill supports install, diagnosis, validation, and removal |
+| **Update reminder**: checks GitHub Releases at most once per day without auto-installing | **Reproducible release**: pins bundled openPE to a recorded upstream commit and publishes SHA-256 files |
+
+<a id="en-demo"></a>
 
 Inline progress example:
 
@@ -482,6 +680,12 @@ Inline progress example:
 [OpenPE ⠴] Still generating 20s
 [OpenPE ⠧] Network is slow 50s
 ```
+
+<p align="center">
+  <img src="assets/readme/inline-progress-demo.gif" alt="OpenPE dynamically showing optimizing, still generating, and slow network states inside the full Codex composer" width="100%" />
+</p>
+
+The GIF above accelerates the three real progress stages inside the full Codex composer. After the hotkey is pressed, the helper updates the animated indicator, current stage, and elapsed seconds directly inside the selected range. The enhanced prompt replaces this progress text in place when generation finishes, so users can distinguish active generation from a slower network response without watching a floating window.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -497,11 +701,61 @@ Inline progress example:
 
 If the window or selection changes during processing, the helper avoids writing into the wrong location and restores the original text when possible. A successful inline replacement restores the previous clipboard; when safe write-back is impossible, the enhanced result remains on the clipboard.
 
+<a id="en-setup-flow"></a>
+
+### 🧭 User Setup Flow and Important Notes
+
+> [!IMPORTANT]
+> This project is not an MCP server that should be added to `~/.codex/config.toml`. The Codex Plugin/Skill provides discovery and installation guidance; the platform helper owns the global hotkey, inline progress, and text replacement; the local `openpe-server` performs prompt enhancement.
+
+#### Optional flow: configure source with the Codex Skill
+
+For regular users, prefer [One-Click Installation from Releases](#en-release-install). The following flow is for development, diagnosis, or users who want Codex to operate the source scripts.
+
+1. Add the public GitHub Marketplace and install the plugin from a terminal:
+
+   ```bash
+   codex plugin marketplace add ChrysFu-FndVent/codex-openpe-hotkey --ref main
+   codex plugin add codex-openpe-hotkey@codex-openpe-hotkey
+   ```
+
+2. Start a new Codex task so it can discover the newly installed Skill, then enter:
+
+   ```text
+   $codex-openpe-hotkey Install and verify the OpenPE hotkey for this desktop platform.
+   ```
+
+3. Allow the task to perform the required local installation operations. Installation accesses Keychain or Windows Credential Manager, per-user startup configuration, log directories, and the app installation directory. If Codex is running in a restricted sandbox, approve the requested operations or use Full Access.
+4. Follow the Skill to prepare `openpe-server`, then enter your OpenAI-compatible API key only in the local secure prompt. Never paste an API key into a Codex conversation, command argument, README, Issue, or log.
+5. Complete the platform setup. macOS requires one Accessibility approval for the first stable-signed installation. Windows uses Windows PowerShell 5.1 and a per-user Startup shortcut, requires no administrator access, and must not be run under WSL or PowerShell 7.
+6. Run the platform status script and finish with a real Codex composer test. Installation is complete only when inline progress appears first and is then replaced by the enhanced prompt.
+
+For manual setup, clone the repository and run the platform commands under [Getting Started](#en-getting-started) from the project root. When using the Skill, it resolves the installed plugin directory itself; do not manually navigate into the Codex plugin cache.
+
+#### Before you configure
+
+| Check | What the user must confirm |
+| --- | --- |
+| **Codex version** | `codex plugin --help` lists `add`, `list`, and `marketplace`; update Codex desktop first if those commands are missing |
+| **Codex plugin** | `codex plugin list` shows `codex-openpe-hotkey@codex-openpe-hotkey` as `installed, enabled`, with a version matching the current release (currently `0.4.0`) |
+| **API key** | Enter it only in the local script's secure prompt; macOS stores it in Keychain and Windows stores it in Credential Manager |
+| **System permission** | On macOS, add and enable `OpenPE Hotkey.app` only when `scripts/status.sh` reports `accessibility: unavailable`; do not repeatedly reopen System Settings |
+| **Hotkey conflict** | If `Option+Q` or `Alt+Q` is already owned, choose another modified shortcut before rerunning the status check |
+| **Local service** | The status script confirms the helper is running, `/healthz` succeeds, and signing/background-startup configuration is valid |
+| **Final acceptance** | Select text in the real Codex composer, press the hotkey, and confirm progress appears and the result replaces it inline; passing CI does not replace local UI acceptance |
+
+> [!NOTE]
+> The macOS path has passed a real Codex composer end-to-end test. Windows build and automated self-tests run in GitHub Actions, but every Windows user must still complete the UI Automation end-to-end test in their own Codex desktop app.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <a id="en-hotkey"></a>
 
 ### ⌨️ Custom Hotkeys
 
 Hotkeys are case-insensitive and must contain at least one modifier plus one ordinary key. A modifier-free `Q`, duplicate modifiers, and unsupported keys are rejected.
+
+Release users can reopen the platform setup wizard and change the **Hotkey** field: use the `open ... --setup` command above on macOS or the Start-menu configurator on Windows. Source installations can also use the commands below.
 
 macOS:
 
@@ -553,6 +807,7 @@ This is not a single MCP service. It is a set of focused plugins and desktop com
 | **Codex Skill** | [`skills/codex-openpe-hotkey/SKILL.md`](skills/codex-openpe-hotkey/SKILL.md) | Guides Codex through installation, configuration, diagnosis, validation, and removal |
 | **macOS Helper** | [`Sources/CodexOpenPEHotkey/`](Sources/CodexOpenPEHotkey/) | Carbon hotkey, Accessibility selection control, and inline progress |
 | **Windows Helper** | [`windows/OpenPEHotkey.Windows.cs`](windows/OpenPEHotkey.Windows.cs) | Win32 hotkey, UI Automation, background startup, and progress replacement |
+| **Native setup wizards** | [`Sources/CodexOpenPEHotkey/SetupWindowController.swift`](Sources/CodexOpenPEHotkey/SetupWindowController.swift), [`windows/SetupWizard.cs`](windows/SetupWizard.cs) | Securely collect local configuration, install the Plugin/Skill, start services, and run health checks |
 | **openPE Server** | [AoManoh/openpe](https://github.com/AoManoh/openpe) | Exposes the local enhancement API and connects to the configured model gateway |
 
 <p align="center">
@@ -569,12 +824,15 @@ This is not a single MCP service. It is a set of focused plugins and desktop com
 
 <a id="en-getting-started"></a>
 
-### 🚀 Getting Started
+### 🚀 Install and Develop from Source
+
+> [!NOTE]
+> This section is for developers. Release installers already bundle openPE, the Plugin/Skill, and the helper, so regular users do not need the build steps below.
 
 #### 1. Shared prerequisites
 
 - Codex or ChatGPT desktop
-- [Git](https://git-scm.com/) when cloning the repository
+- [Git](https://git-scm.com/) when cloning the repository or installing from a remote Git Marketplace
 - [Go 1.25+](https://go.dev/dl/) to build the current openPE source
 - An OpenAI-compatible API key, gateway, and model
 
@@ -608,7 +866,7 @@ Alternatively, choose **Code → Download ZIP** on the GitHub repository page, e
 
 #### 3. Install the Codex plugin from GitHub
 
-After the repository is published:
+To install the plugin from source:
 
 ```bash
 codex plugin marketplace add ChrysFu-FndVent/codex-openpe-hotkey --ref main
@@ -760,6 +1018,7 @@ Windows PowerShell:
 
 ```powershell
 dotnet build .\windows\CodexOpenPEHotkey.Windows.csproj -c Release
+dotnet build .\windows\CodexOpenPEHotkey.Setup.csproj -c Release
 .\scripts\windows\validate.ps1
 ```
 
@@ -779,8 +1038,11 @@ GitHub Actions builds and validates the platform implementations on separate mac
 ├── Sources/                               # macOS Swift helper
 ├── Tests/CoreSelfTests/                   # macOS core self-tests
 ├── windows/                               # Windows .NET Framework helper
+├── installer/windows/                     # Windows Inno Setup installer
 ├── scripts/                               # macOS install and maintenance
 ├── scripts/windows/                       # Windows install and maintenance
+├── scripts/release/                       # Pinned dependency builds, packaging, and installer smoke tests
+├── release/                               # Release version and pinned openPE commit
 ├── launchd/                               # macOS LaunchAgent templates
 ├── skills/codex-openpe-hotkey/            # Codex Skill
 └── assets/readme/                         # README diagram source and export

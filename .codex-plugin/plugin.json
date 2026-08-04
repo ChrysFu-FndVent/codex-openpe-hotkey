@@ -1,6 +1,6 @@
 {
   "name": "codex-openpe-hotkey",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Enhance selected Codex desktop prompts with a configurable hotkey, defaulting to Option+Q on macOS and Alt+Q on Windows, with inline progress.",
   "author": {
     "name": "Codex OpenPE Hotkey Contributors"

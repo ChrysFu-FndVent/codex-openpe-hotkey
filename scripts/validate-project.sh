@@ -7,7 +7,7 @@ cd "$project_root"
 swift build
 swift run CoreSelfTests
 
-for script in scripts/*.sh; do
+for script in scripts/*.sh scripts/release/*.sh; do
   /bin/bash -n "$script"
 done
 
@@ -25,14 +25,40 @@ done
 for windows_file in \
   windows/OpenPEHotkey.Windows.cs \
   windows/CodexOpenPEHotkey.Windows.csproj \
+  windows/SetupWizard.cs \
+  windows/CodexOpenPEHotkey.Setup.csproj \
+  installer/windows/CodexOpenPEHotkey.iss \
   scripts/windows/install.ps1 \
   scripts/windows/configure.ps1 \
   scripts/windows/start.ps1 \
   scripts/windows/status.ps1 \
   scripts/windows/uninstall.ps1 \
-  scripts/windows/validate.ps1; do
+  scripts/windows/validate.ps1 \
+  scripts/windows/installer-uninstall.ps1 \
+  scripts/release/build-openpe.ps1 \
+  scripts/release/package-windows.ps1 \
+  scripts/release/smoke-windows.ps1; do
   if [ ! -f "$windows_file" ]; then
     echo "Missing Windows component: $windows_file" >&2
+    exit 1
+  fi
+done
+
+release_version="$(tr -d '[:space:]' < release/version.txt)"
+plugin_version="$(/usr/bin/jq -r '.version' .codex-plugin/plugin.json)"
+plist_version="$(/usr/bin/plutil -extract CFBundleShortVersionString raw config/Info.plist)"
+if [ "$release_version" != "$plugin_version" ] || [ "$release_version" != "$plist_version" ]; then
+  echo "Release version mismatch: release=$release_version plugin=$plugin_version plist=$plist_version" >&2
+  exit 1
+fi
+for versioned_file in \
+  Sources/CodexOpenPEHotkey/ReleaseInstaller.swift \
+  windows/CodexOpenPEHotkey.Windows.csproj \
+  windows/CodexOpenPEHotkey.Setup.csproj \
+  windows/OpenPEHotkey.Windows.cs \
+  installer/windows/CodexOpenPEHotkey.iss; do
+  if ! /usr/bin/grep -Fq "$release_version" "$versioned_file"; then
+    echo "Release version $release_version is missing from $versioned_file" >&2
     exit 1
   fi
 done

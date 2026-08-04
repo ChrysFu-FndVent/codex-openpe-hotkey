@@ -115,6 +115,17 @@ do {
     print("FAIL: OpenPE response decoding threw \(error)")
 }
 
+if let current = ReleaseVersion("0.4.0"),
+   let newer = ReleaseVersion("v0.5.0"),
+   let equivalent = ReleaseVersion("0.4") {
+    expect(current < newer, "Newer GitHub release versions are detected")
+    expect(current == equivalent, "Missing release version components default to zero")
+} else {
+    failures += 1
+    print("FAIL: Valid release versions were rejected")
+}
+expect(ReleaseVersion("release-latest") == nil, "Invalid release versions are rejected")
+
 if failures > 0 {
     print("\(failures) self-test(s) failed")
     exit(EXIT_FAILURE)
