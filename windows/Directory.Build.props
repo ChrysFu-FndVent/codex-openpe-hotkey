@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'CodexOpenPEHotkey.Setup'">
+    <BaseIntermediateOutputPath>obj\Setup\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>obj\Setup\</MSBuildProjectExtensionsPath>
+    <BaseOutputPath>bin\Setup\</BaseOutputPath>
+  </PropertyGroup>
+</Project>
