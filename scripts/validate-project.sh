@@ -27,6 +27,7 @@ for windows_file in \
   windows/CodexOpenPEHotkey.Windows.csproj \
   windows/SetupWizard.cs \
   windows/CodexOpenPEHotkey.Setup.csproj \
+  windows/Directory.Build.props \
   installer/windows/CodexOpenPEHotkey.iss \
   scripts/windows/install.ps1 \
   scripts/windows/configure.ps1 \
