@@ -23,8 +23,14 @@ $dataDirectory = Join-Path $env:LOCALAPPDATA "CodexOpenPEHotkey"
 $startupDirectory = [Environment]::GetFolderPath([Environment+SpecialFolder]::Startup)
 $startupShortcut = Join-Path $startupDirectory "Codex OpenPE Hotkey.lnk"
 
-& $Installer /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
-if ($LASTEXITCODE -ne 0) { throw "Silent installer failed with exit code $LASTEXITCODE." }
+$installerProcess = Start-Process `
+    -FilePath $Installer `
+    -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" `
+    -Wait `
+    -PassThru
+if ($installerProcess.ExitCode -ne 0) {
+    throw "Silent installer failed with exit code $($installerProcess.ExitCode)."
+}
 foreach ($required in @(
     "CodexOpenPEHotkey.Windows.dll",
     "CodexOpenPEHotkey.Setup.exe",
@@ -78,12 +84,24 @@ for ($attempt = 0; $attempt -lt 40; $attempt++) {
     Start-Sleep -Milliseconds 250
 }
 if (-not $healthy) { throw "Installed openPE server did not pass its health check." }
-& (Join-Path $installDirectory "status.ps1")
-if ($LASTEXITCODE -ne 0) { throw "Installed status check failed." }
+$statusScript = Join-Path $installDirectory "status.ps1"
+$windowsPowerShell = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
+$statusProcess = Start-Process `
+    -FilePath $windowsPowerShell `
+    -ArgumentList ('-NoProfile -ExecutionPolicy Bypass -File "{0}"' -f $statusScript) `
+    -Wait `
+    -PassThru
+if ($statusProcess.ExitCode -ne 0) { throw "Installed status check failed." }
 
 $uninstaller = Join-Path $installDirectory "unins000.exe"
-& $uninstaller /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
-if ($LASTEXITCODE -ne 0) { throw "Silent uninstall failed with exit code $LASTEXITCODE." }
+$uninstallerProcess = Start-Process `
+    -FilePath $uninstaller `
+    -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" `
+    -Wait `
+    -PassThru
+if ($uninstallerProcess.ExitCode -ne 0) {
+    throw "Silent uninstall failed with exit code $($uninstallerProcess.ExitCode)."
+}
 for ($attempt = 0; $attempt -lt 20 -and (Test-Path -LiteralPath $installDirectory); $attempt++) {
     Start-Sleep -Milliseconds 250
 }
